@@ -27,11 +27,6 @@ void Engine::update()
     while (!m_mouse.isEventBufferEmpty())
     {
         MouseEvent l_event = m_mouse.readEvent();
-        if (l_event.getType() == MouseEvent::EventType::RawMove)
-        {
-            std::string str;
-            str = "(" + std::to_string(l_event.getX()) + ", " + std::to_string(l_event.getY()) + ")\n";
-            OutputDebugStringA(str.c_str());
-        }
+
     }
 }
