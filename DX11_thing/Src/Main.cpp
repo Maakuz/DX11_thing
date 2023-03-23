@@ -18,6 +18,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	while (l_engine.processMessage() == true)
 	{
 		l_engine.update();
+		l_engine.render();
 	}
 
 	return 0;
