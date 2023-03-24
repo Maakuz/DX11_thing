@@ -30,13 +30,20 @@ void Graphics::render()
     m_deviceContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
     m_deviceContext->PSSetShader(m_pixelShader.getShader(), NULL, 0);
 
+    //CB 
+    m_constantBuffer.m_data = { 0.5f, 0.5f };
+    m_constantBuffer.UpdateBuffer();
+
+    m_deviceContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
+
     UINT l_stride = sizeof(Vertex);
     UINT l_offset = 0;
 
-    m_deviceContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &l_stride, &l_offset);
+    m_deviceContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), m_vertexBuffer.StridePtr(), &l_offset);
+    m_deviceContext->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
     m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
-    m_deviceContext->Draw(6, 0); //TODO: No hardcoded num
+    m_deviceContext->DrawIndexed(m_indexBuffer.IndexCount(), 0, 0); //TODO: No hardcoded num
 
     //text
     m_spriteBatch->Begin();
@@ -256,32 +263,27 @@ bool Graphics::initializeScene()
         {0.3, -0.3, 0.5f,
         1.f, 1.f},
 
-        {0.3, -0.3, 0.5f,
-        1.f, 1.f},
-
         {-0.3, -0.3, 0.5f,
         0.f, 1.f},
-
-        {-0.3, 0.3, 0.5f,
-        0.f, 0.f},
     };
 
-    D3D11_BUFFER_DESC l_vertexBufferDesc = {0};
+    DWORD l_indicies[] = 
+    {
+        0, 1, 2, 
+        2, 3, 0
+    };
 
-    l_vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    l_vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(l_v);
-    l_vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    l_vertexBufferDesc.CPUAccessFlags = 0;
-    l_vertexBufferDesc.MiscFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA l_vertexBufferData = {0};
-    l_vertexBufferData.pSysMem = l_v;
-
-    HRESULT l_hr = m_device->CreateBuffer(&l_vertexBufferDesc, &l_vertexBufferData, m_vertexBuffer.GetAddressOf());
-
+    HRESULT l_hr = m_vertexBuffer.initialize(m_device.Get(), l_v, ARRAYSIZE(l_v));
     if (FAILED(l_hr))
     {
         ErrorLogger::log(l_hr, "Vertex buffer creation failed.");
+        return false;
+    }
+
+    l_hr = m_indexBuffer.initialize(m_device.Get(), l_indicies, 6);
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "index buffer creation failed.");
         return false;
     }
 
@@ -290,6 +292,13 @@ bool Graphics::initializeScene()
     if (FAILED(l_hr))
     {
         ErrorLogger::log(l_hr, "Texture load failed.");
+        return false;
+    }
+
+    l_hr =  m_constantBuffer.initialize(m_device.Get(), m_deviceContext.Get());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Failed to create CB.");
         return false;
     }
 

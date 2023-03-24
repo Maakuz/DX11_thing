@@ -10,6 +10,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (FAILED(hr))
 		ErrorLogger::log(hr, "test");*/
 
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	HRESULT l_hr = CoInitialize(NULL);
 	if (FAILED(l_hr))
 	{

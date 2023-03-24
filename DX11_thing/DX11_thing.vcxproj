@@ -161,9 +161,13 @@
   <ItemGroup>
     <ClInclude Include="Src\Definitions.h" />
     <ClInclude Include="Src\Graphics\AdapterReader.h" />
+    <ClInclude Include="Src\Graphics\ConstantBufferStructs.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
+    <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\Shaders.h" />
     <ClInclude Include="Src\Graphics\Vertex.h" />
+    <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Keyboard\Keyboard.h" />
     <ClInclude Include="Src\Keyboard\KeyboardEvent.h" />
     <ClInclude Include="Src\Engine.h" />
