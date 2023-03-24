@@ -13,13 +13,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 	Engine l_engine;
-	l_engine.initialize(hInstance, "Best engie", "WindowClass", 1920, 1080);
-
-	while (l_engine.processMessage() == true)
+	if (l_engine.initialize(hInstance, "Best engie", "WindowClass", 1920, 1080))
 	{
-		l_engine.update();
-		l_engine.render();
+		while (l_engine.processMessage() == true)
+		{
+			l_engine.update();
+			l_engine.render();
+		}
 	}
-
 	return 0;
 }
