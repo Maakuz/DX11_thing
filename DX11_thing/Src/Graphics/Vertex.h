@@ -5,12 +5,12 @@ struct Vertex
 {
     Vertex() :
         pos(0, 0, 0),
-        col(0, 0, 0) {}
+        tex(0, 0) {}
 
-    Vertex(float x, float y, float z, float r, float g, float b) :
+    Vertex(float x, float y, float z, float u, float v) :
         pos(x, y, z), 
-        col(r, g, b) {}
+        tex(u, v) {}
 
     DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT3 col;
+    DirectX::XMFLOAT2 tex;
 };

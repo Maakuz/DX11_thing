@@ -10,7 +10,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (FAILED(hr))
 		ErrorLogger::log(hr, "test");*/
 
-
+	HRESULT l_hr = CoInitialize(NULL);
+	if (FAILED(l_hr))
+	{
+		ErrorLogger::log(l_hr, "Error coinitializing");
+		return -1;
+	}
 
 	Engine l_engine;
 	if (l_engine.initialize(hInstance, "Best engie", "WindowClass", 1920, 1080))

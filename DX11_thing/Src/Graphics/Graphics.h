@@ -4,6 +4,7 @@
 #include "Vertex.h"
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
+#include <WICTextureLoader.h>
 
 class Graphics
 {
@@ -33,6 +34,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 
-	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch; //TODO: SEPARATE TO TEXT CLASS?
 	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
+
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
 };

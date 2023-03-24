@@ -13,14 +13,22 @@ bool RenderWindow::initialize(WindowContainer* pWinContainer, HINSTANCE hInstanc
 
     this->registerWindowClass();
 
+    RECT l_winRect;
+    l_winRect.left = 50;
+    l_winRect.top = 50;
+    l_winRect.right = l_winRect.left + width;
+    l_winRect.bottom = l_winRect.top + height;
+
+    AdjustWindowRect(&l_winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+
     m_handle = CreateWindowEx(0,
         m_windowClassW.c_str(),
         m_winTitleW.c_str(),
         WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-        0,
-        0,
-        m_width,
-        m_height,
+        l_winRect.left,
+        l_winRect.top,
+        l_winRect.right - l_winRect.left,  //TODO: Figure out this magic
+        l_winRect.bottom - l_winRect.top,
         NULL,
         NULL,
         m_hInstance,

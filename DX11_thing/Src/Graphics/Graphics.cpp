@@ -26,6 +26,8 @@ void Graphics::render()
     m_deviceContext->OMSetDepthStencilState(m_depthStencilState.Get(), 0);
 
     m_deviceContext->VSSetShader(m_vertexShader.getShader(), NULL, 0);
+
+    m_deviceContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
     m_deviceContext->PSSetShader(m_pixelShader.getShader(), NULL, 0);
 
     UINT l_stride = sizeof(Vertex);
@@ -33,7 +35,13 @@ void Graphics::render()
 
     m_deviceContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &l_stride, &l_offset);
 
-    m_deviceContext->Draw(3, 0); //No hardcoded num
+    m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+    m_deviceContext->Draw(6, 0); //TODO: No hardcoded num
+
+    //text
+    m_spriteBatch->Begin();
+    m_spriteFont->DrawString(m_spriteBatch.get(), "Hello boy", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT2(1, 1));
+    m_spriteBatch->End();
 
     m_swapChain->Present(1, NULL);
 }
@@ -173,6 +181,28 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
         return false;
     }
 
+    m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(m_deviceContext.Get());
+    m_spriteFont = std::make_unique<DirectX::SpriteFont>(m_device.Get(), L"Data/Fonts/Comic_sans16.spritefont");
+
+    //Sampler
+    D3D11_SAMPLER_DESC l_sampDesc;
+    ZeroMemory(&l_sampDesc, sizeof(D3D11_SAMPLER_DESC));
+
+    l_sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    l_sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    l_sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    l_sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    l_sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    l_sampDesc.MinLOD = 0;
+    l_sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    l_hr = m_device->CreateSamplerState(&l_sampDesc, m_samplerState.GetAddressOf());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Failed creating sampler state.");
+        return false;
+    }
+
     return true;
 }
 
@@ -199,7 +229,7 @@ bool Graphics::initializeShaders()
     D3D11_INPUT_ELEMENT_DESC l_layout[] =
     {
         {"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"COL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
 
     UINT l_elementCount = ARRAYSIZE(l_layout);
@@ -217,14 +247,23 @@ bool Graphics::initializeScene()
 {
     Vertex l_v[] =
     {
-        {0.f, 0.3f, 0.5f, 
-        1.f, 0.f, 0.f},
+        {-0.3f, 0.3f, 0.5f, 
+        0.f, 0.f},
+
+        {0.3, 0.3, 0.5f,
+        1.f, 0.f},
 
         {0.3, -0.3, 0.5f,
-        0.f, 1.f, 0.f},
+        1.f, 1.f},
+
+        {0.3, -0.3, 0.5f,
+        1.f, 1.f},
 
         {-0.3, -0.3, 0.5f,
-        0.f, 0.f, 1.f},
+        0.f, 1.f},
+
+        {-0.3, 0.3, 0.5f,
+        0.f, 0.f},
     };
 
     D3D11_BUFFER_DESC l_vertexBufferDesc = {0};
@@ -243,6 +282,14 @@ bool Graphics::initializeScene()
     if (FAILED(l_hr))
     {
         ErrorLogger::log(l_hr, "Vertex buffer creation failed.");
+        return false;
+    }
+
+    //Texture setup
+    l_hr = DirectX::CreateWICTextureFromFile(m_device.Get(), L"Data/Textures/julpeg.png", nullptr, m_texture.GetAddressOf());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Texture load failed.");
         return false;
     }
 
