@@ -16,11 +16,14 @@ bool Graphics::initialize(HWND hwnd, int width, int height)
 
 void Graphics::render()
 {
-    float l_bgCol[] = {0.f, 0.f, 1.f, 1.f};
+    float l_bgCol[] = {0.3f, 0.3f, 0.3f, 1.f};
     m_deviceContext->ClearRenderTargetView(m_renderTargetView.Get(), l_bgCol);
+    m_deviceContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
     m_deviceContext->IASetInputLayout(m_vertexShader.getInputLayout());
     m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_deviceContext->RSSetState(m_rasterizerState.Get());
+    m_deviceContext->OMSetDepthStencilState(m_depthStencilState.Get(), 0);
 
     m_deviceContext->VSSetShader(m_vertexShader.getShader(), NULL, 0);
     m_deviceContext->PSSetShader(m_pixelShader.getShader(), NULL, 0);
@@ -103,7 +106,48 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
         return false;
     }
 
-    m_deviceContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), NULL);
+    //Depth stencil
+    D3D11_TEXTURE2D_DESC l_depthStencilDesc;
+    l_depthStencilDesc.Width = width;
+    l_depthStencilDesc.Height = height;
+    l_depthStencilDesc.MipLevels = 1;
+    l_depthStencilDesc.ArraySize = 1;
+    l_depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    l_depthStencilDesc.SampleDesc.Count = 1;
+    l_depthStencilDesc.SampleDesc.Quality = 0;
+    l_depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+    l_depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    l_depthStencilDesc.CPUAccessFlags = 0;
+    l_depthStencilDesc.MiscFlags = 0;
+
+    l_hr = m_device->CreateTexture2D(&l_depthStencilDesc, NULL, m_depthStencilBuffer.GetAddressOf());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Failed creating depth texture.");
+        return false;
+    }
+
+    l_hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), NULL, m_depthStencilView.GetAddressOf());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Failed creating depth stencil view.");
+        return false;
+    }
+
+    m_deviceContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
+
+    //Depth stencil state
+    D3D11_DEPTH_STENCIL_DESC l_depthStencilStateDesc = { 0 };
+    l_depthStencilStateDesc.DepthEnable = true;
+    l_depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    l_depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+    l_hr = m_device->CreateDepthStencilState(&l_depthStencilStateDesc, m_depthStencilState.GetAddressOf());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Failed creating depth stencil state.");
+        return false;
+    }
 
     //Viewport
     D3D11_VIEWPORT l_viewPort = {0};
@@ -112,8 +156,22 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
     l_viewPort.TopLeftY = 0;
     l_viewPort.Width = width;
     l_viewPort.Height = height;
+    l_viewPort.MaxDepth = 0.f;
+    l_viewPort.MaxDepth = 1.f;
 
     m_deviceContext->RSSetViewports(1, &l_viewPort);
+
+    D3D11_RASTERIZER_DESC l_rasterDesc;
+    ZeroMemory(&l_rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
+
+    l_rasterDesc.FillMode = D3D11_FILL_SOLID; //Wireframe possible
+    l_rasterDesc.CullMode = D3D11_CULL_BACK;
+    l_hr = m_device->CreateRasterizerState(&l_rasterDesc, m_rasterizerState.GetAddressOf());
+    if (FAILED(l_hr))
+    {
+        ErrorLogger::log(l_hr, "Failed creating raster state.");
+        return false;
+    }
 
     return true;
 }
@@ -140,7 +198,7 @@ bool Graphics::initializeShaders()
 
     D3D11_INPUT_ELEMENT_DESC l_layout[] =
     {
-        {"POS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
 
@@ -159,13 +217,13 @@ bool Graphics::initializeScene()
 {
     Vertex l_v[] =
     {
-        {0.f, 0.3f, 
+        {0.f, 0.3f, 0.5f, 
         1.f, 0.f, 0.f},
 
-        {0.3, -0.3,
+        {0.3, -0.3, 0.5f,
         0.f, 1.f, 0.f},
 
-        {-0.3, -0.3,
+        {-0.3, -0.3, 0.5f,
         0.f, 0.f, 1.f},
     };
 
