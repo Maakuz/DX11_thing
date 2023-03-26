@@ -9,11 +9,16 @@
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "Camera.h"
+#include "../Timer.h"
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_win32.h"
+#include "ImGui/imgui_impl_dx11.h"
 
 class Graphics
 {
 public:
 	bool initialize(HWND hwnd, int width, int height);
+	~Graphics();
 
 	void render();
 
@@ -48,6 +53,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+
+	Timer m_timer;
 
 
 	int m_winWidth = 0;

@@ -29,7 +29,7 @@ void Timer::restart()
 
 bool Timer::start()
 {
-    if (!m_running)
+    if (m_running)
         return false;
 
     else

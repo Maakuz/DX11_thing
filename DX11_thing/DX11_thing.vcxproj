@@ -151,6 +151,12 @@
     <ClCompile Include="Src\Graphics\AdapterReader.cpp" />
     <ClCompile Include="Src\Graphics\Camera.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\ImGui\imgui.cpp" />
+    <ClCompile Include="Src\Graphics\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Src\Graphics\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Src\Graphics\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Src\Graphics\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="Src\Graphics\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Src\Graphics\Shaders.cpp" />
     <ClCompile Include="Src\Keyboard\Keyboard.cpp" />
     <ClCompile Include="Src\Engine.cpp" />
@@ -161,6 +167,14 @@
     <ClCompile Include="Src\WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Graphics\ImGui\imconfig.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imgui.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imgui_internal.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imstb_textedit.h" />
+    <ClInclude Include="Src\Graphics\ImGui\imstb_truetype.h" />
     <ClInclude Include="Src\Timer.h" />
     <ClInclude Include="Src\Definitions.h" />
     <ClInclude Include="Src\Graphics\AdapterReader.h" />
