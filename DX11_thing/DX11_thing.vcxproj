@@ -157,9 +157,11 @@
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\Mouse\Mouse.cpp" />
     <ClCompile Include="Src\RenderWindow.cpp" />
+    <ClCompile Include="Src\Timer.cpp" />
     <ClCompile Include="Src\WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Timer.h" />
     <ClInclude Include="Src\Definitions.h" />
     <ClInclude Include="Src\Graphics\AdapterReader.h" />
     <ClInclude Include="Src\Graphics\Camera.h" />
