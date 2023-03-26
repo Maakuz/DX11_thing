@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Src\Graphics\AdapterReader.cpp" />
+    <ClCompile Include="Src\Graphics\Camera.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\Shaders.cpp" />
     <ClCompile Include="Src\Keyboard\Keyboard.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="Src\Definitions.h" />
     <ClInclude Include="Src\Graphics\AdapterReader.h" />
+    <ClInclude Include="Src\Graphics\Camera.h" />
     <ClInclude Include="Src\Graphics\ConstantBufferStructs.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />

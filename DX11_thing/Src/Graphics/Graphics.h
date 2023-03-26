@@ -8,6 +8,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
+#include "Camera.h"
 
 class Graphics
 {
@@ -17,7 +18,7 @@ public:
 	void render();
 
 private:
-	bool initializeDirectX(HWND hwnd, int width, int height);
+	bool initializeDirectX(HWND hwnd);
 	bool initializeShaders();
 	bool initializeScene();
 
@@ -45,4 +46,9 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+
+	Camera m_camera;
+
+	int m_winWidth = 0;
+	int m_winHeight = 0;
 };

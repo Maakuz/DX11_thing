@@ -2,7 +2,10 @@
 
 bool Graphics::initialize(HWND hwnd, int width, int height)
 {
-    if (!this->initializeDirectX(hwnd, width, height))
+    m_winHeight = height;
+    m_winWidth = width;
+
+    if (!this->initializeDirectX(hwnd))
         return false;
 
     if (!this->initializeShaders())
@@ -31,7 +34,12 @@ void Graphics::render()
     m_deviceContext->PSSetShader(m_pixelShader.getShader(), NULL, 0);
 
     //CB 
-    m_constantBuffer.m_data = { 0.5f, 0.5f };
+    DirectX::XMMATRIX l_world = DirectX::XMMatrixIdentity();
+
+    m_camera.move(0.01, 0.01, 0);
+    m_camera.setLookAt(DirectX::XMFLOAT3(0, 0, 0));
+    m_constantBuffer.m_data.mat = l_world * m_camera.getView() * m_camera.getProjection();
+    m_constantBuffer.m_data.mat = DirectX::XMMatrixTranspose(m_constantBuffer.m_data.mat);
     m_constantBuffer.UpdateBuffer();
 
     m_deviceContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
@@ -53,7 +61,7 @@ void Graphics::render()
     m_swapChain->Present(1, NULL);
 }
 
-bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
+bool Graphics::initializeDirectX(HWND hwnd)
 {
     std::vector<AdapterData> l_adapters = AdapterReader::getAdapters();
 
@@ -65,8 +73,8 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
 
     DXGI_SWAP_CHAIN_DESC l_scd = { 0 };
 
-    l_scd.BufferDesc.Width = width;
-    l_scd.BufferDesc.Height = height;
+    l_scd.BufferDesc.Width = m_winWidth;
+    l_scd.BufferDesc.Height = m_winHeight;
     l_scd.BufferDesc.RefreshRate.Numerator = 120;
     l_scd.BufferDesc.RefreshRate.Denominator = 1;
     l_scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -123,8 +131,8 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
 
     //Depth stencil
     D3D11_TEXTURE2D_DESC l_depthStencilDesc;
-    l_depthStencilDesc.Width = width;
-    l_depthStencilDesc.Height = height;
+    l_depthStencilDesc.Width = m_winWidth;
+    l_depthStencilDesc.Height = m_winHeight;
     l_depthStencilDesc.MipLevels = 1;
     l_depthStencilDesc.ArraySize = 1;
     l_depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -169,8 +177,8 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height)
 
     l_viewPort.TopLeftX = 0;
     l_viewPort.TopLeftY = 0;
-    l_viewPort.Width = width;
-    l_viewPort.Height = height;
+    l_viewPort.Width = m_winWidth;
+    l_viewPort.Height = m_winHeight;
     l_viewPort.MaxDepth = 0.f;
     l_viewPort.MaxDepth = 1.f;
 
@@ -254,16 +262,16 @@ bool Graphics::initializeScene()
 {
     Vertex l_v[] =
     {
-        {-0.3f, 0.3f, 0.5f, 
+        {-0.3f, 0.3f, 0.f, 
         0.f, 0.f},
 
-        {0.3, 0.3, 0.5f,
+        {0.3, 0.3, 0.f,
         1.f, 0.f},
 
-        {0.3, -0.3, 0.5f,
+        {0.3, -0.3, 0.f,
         1.f, 1.f},
 
-        {-0.3, -0.3, 0.5f,
+        {-0.3, -0.3, 0.f,
         0.f, 1.f},
     };
 
@@ -301,6 +309,9 @@ bool Graphics::initializeScene()
         ErrorLogger::log(l_hr, "Failed to create CB.");
         return false;
     }
+
+    m_camera.setPos(0, 0, -2);
+    m_camera.setProjecton(90, float(m_winWidth) / float(m_winHeight), 0.1f, 1000.f);
 
     return true;
 }
