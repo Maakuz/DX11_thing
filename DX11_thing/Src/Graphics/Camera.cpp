@@ -110,4 +110,8 @@ void Camera::updateView()
 
     XMVECTOR l_up = XMVector3TransformCoord(DEFAULT_UP_VECTOR, l_rotMat);
     m_view = XMMatrixLookAtLH(m_posVec, l_target, l_up);
+
+    XMMATRIX l_vecRotMat = XMMatrixRotationRollPitchYaw(m_rotation.x, m_rotation.y, 0.f);
+    m_right = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, l_vecRotMat);
+    m_forward = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, l_vecRotMat);
 }

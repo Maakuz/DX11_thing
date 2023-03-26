@@ -22,9 +22,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Engine l_engine;
 	if (l_engine.initialize(hInstance, "Best engie", "WindowClass", 1920, 1080))
 	{
-		while (l_engine.processMessage() == true)
+		while (l_engine.processMessage() == true && l_engine.update() == true)
 		{
-			l_engine.update();
 			l_engine.render();
 		}
 	}

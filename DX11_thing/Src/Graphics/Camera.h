@@ -15,6 +15,9 @@ public:
     const DirectX::XMVECTOR& getRotationVec() const { return m_RotationVec; }
     const DirectX::XMFLOAT3& getRotationFloat3() const { return m_rotation; }
 
+    const DirectX::XMVECTOR& getForward() const { return m_forward; }
+    const DirectX::XMVECTOR& getRight() const { return m_right; }
+
     void setPos(const DirectX::XMVECTOR& pos);
     void setPos(float x, float y, float z);
     void move(const DirectX::XMVECTOR& pos);    //Adjusts to current position + input value
@@ -33,7 +36,10 @@ private:
     DirectX::XMFLOAT3 m_rotation;
     DirectX::XMMATRIX m_view;
     DirectX::XMMATRIX m_projection;
+    DirectX::XMVECTOR m_right;
+    DirectX::XMVECTOR m_forward;
 
     const DirectX::XMVECTOR DEFAULT_FORWARD_VECTOR = DirectX::XMVectorSet(0.f, 0.f, 1.f, 0.f);
     const DirectX::XMVECTOR DEFAULT_UP_VECTOR = DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    const DirectX::XMVECTOR DEFAULT_RIGHT_VECTOR = DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f);
 };

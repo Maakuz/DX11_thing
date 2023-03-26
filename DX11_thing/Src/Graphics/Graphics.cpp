@@ -35,9 +35,6 @@ void Graphics::render()
 
     //CB 
     DirectX::XMMATRIX l_world = DirectX::XMMatrixIdentity();
-
-    m_camera.move(0.01, 0.01, 0);
-    m_camera.setLookAt(DirectX::XMFLOAT3(0, 0, 0));
     m_constantBuffer.m_data.mat = l_world * m_camera.getView() * m_camera.getProjection();
     m_constantBuffer.m_data.mat = DirectX::XMMatrixTranspose(m_constantBuffer.m_data.mat);
     m_constantBuffer.UpdateBuffer();
