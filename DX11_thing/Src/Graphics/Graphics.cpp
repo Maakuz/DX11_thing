@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include "../ConsoleWindow.h"
 
 bool Graphics::initialize(HWND hwnd, int width, int height)
 {
@@ -59,27 +60,29 @@ void Graphics::render()
     m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
     m_deviceContext->DrawIndexed(m_indexBuffer.IndexCount(), 0, 0); //TODO: No hardcoded num
 
-    //text
+    //text //TODO: MAKE BETTER
     static int s_fps = 0;
     static std::string s_fpsStr;
     s_fps++;
 
     if (m_timer.millisecondsElapsed() > 1000)
     {
-        s_fpsStr = "FPS: " + std::to_string(s_fps);
+        monitorCon("FPS", std::to_string(s_fps));
         s_fps = 0;
         m_timer.restart();
     }
 
-    m_spriteBatch->Begin();
-    m_spriteFont->DrawString(m_spriteBatch.get(), s_fpsStr.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT2(1, 1));
-    m_spriteBatch->End();
+    //m_spriteBatch->Begin();
+    //m_spriteFont->DrawString(m_spriteBatch.get(), s_fpsStr.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT2(1, 1));
+    //m_spriteBatch->End();
 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("Test");
+    ImGui::Begin("Debug");
+    ImGui::Text(s_fpsStr.c_str());
     ImGui::End();
+    ConsoleWindow::get().update();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

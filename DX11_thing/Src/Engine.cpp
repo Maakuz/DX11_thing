@@ -1,4 +1,6 @@
 #include "Engine.h"
+#include "ConsoleWindow.h"
+
 using namespace DirectX;
 
 bool Engine::initialize(HINSTANCE hInstance, std::string title, std::string windowClass, int width, int height)
