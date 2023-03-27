@@ -199,6 +199,16 @@ void ConsoleWindow::addCommand(std::string commandLine, std::function<RetVal(Arg
         m_commands.push_back(Command(commandLine, func));
 }
 
+void ConsoleWindow::addStaticCommand(std::string commandLine, std::function<RetVal(Arguments args)> func)
+{
+    for (Command& command : m_commands)
+        if (command.commandLine == commandLine)
+            return;
+
+    m_commands.push_back(Command(commandLine, func));
+    this->addLog("Static command \"" + commandLine + "\" added!");   
+}
+
 void ConsoleWindow::print(std::string text)
 {
     addLog(text, ConsoleColors::foreign);

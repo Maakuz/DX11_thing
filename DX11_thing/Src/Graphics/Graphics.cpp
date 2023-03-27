@@ -79,9 +79,6 @@ void Graphics::render()
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("Debug");
-    ImGui::Text(s_fpsStr.c_str());
-    ImGui::End();
     ConsoleWindow::get().update();
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

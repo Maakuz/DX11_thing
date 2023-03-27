@@ -8,8 +8,6 @@
 
 #define printfCon(format, ...) ConsoleWindow::get().printf(format, __VA_ARGS__)
 #define monitorCon(lableStr, valueStr) ConsoleWindow::get().monitor(lableStr, valueStr)
-#define addConsoleCommand(commandStr, function) ConsoleWindow::get().addCommand(commandStr, [&](Arguments args)->RetVal{function})
-
 
 typedef std::vector<std::string> Arguments;
 
@@ -42,6 +40,7 @@ public:
 	}
 
 	void addCommand(std::string commandLine, std::function<RetVal(Arguments args)> func);
+	void addStaticCommand(std::string commandLine, std::function<RetVal(Arguments args)> func);
 	void print(std::string text);
 	void print(const char* format, ...);
 	void update();
