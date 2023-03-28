@@ -3,10 +3,7 @@ using namespace DirectX;
 
 Camera::Camera()
 {
-    m_pos = XMFLOAT3(0.f, 0.f, 0.f);
-    m_posVec = XMLoadFloat3(&m_pos);
-    m_rotation = XMFLOAT3(0.f, 0.f, 0.f);
-    m_RotationVec = XMLoadFloat3(&m_rotation);
+
     this->updateView();
 }
 
@@ -23,6 +20,13 @@ void Camera::setPos(const DirectX::XMVECTOR& pos)
     this->updateView();
 }
 
+void Camera::setPos(const DirectX::XMFLOAT3& pos)
+{
+    m_pos = pos;
+    m_posVec = XMLoadFloat3(&m_pos);
+    this->updateView();
+}
+
 void Camera::setPos(float x, float y, float z)
 {
     m_pos = XMFLOAT3(x, y, z);
@@ -34,6 +38,15 @@ void Camera::move(const DirectX::XMVECTOR& pos)
 {
     m_posVec += pos;
     XMStoreFloat3(&m_pos, m_posVec);
+    this->updateView();
+}
+
+void Camera::move(const DirectX::XMFLOAT3& pos)
+{
+    m_pos.x += pos.x;
+    m_pos.y += pos.y;
+    m_pos.z += pos.z;
+    m_posVec = XMLoadFloat3(&m_pos);
     this->updateView();
 }
 
@@ -53,6 +66,13 @@ void Camera::setRotation(const DirectX::XMVECTOR& rot)
     this->updateView();
 }
 
+void Camera::setRotation(const DirectX::XMFLOAT3& rot)
+{
+    m_rotation = rot;
+    m_RotationVec = XMLoadFloat3(&m_rotation);
+    this->updateView();
+}
+
 void Camera::setRotation(float x, float y, float z)
 {
     m_rotation = XMFLOAT3(x, y, z);
@@ -64,6 +84,15 @@ void Camera::rotate(const DirectX::XMVECTOR& rot)
 {
     m_RotationVec += rot;
     XMStoreFloat3(&m_rotation, m_RotationVec);
+    this->updateView();
+}
+
+void Camera::rotate(const DirectX::XMFLOAT3& rot)
+{
+    m_rotation.x += rot.x;
+    m_rotation.y += rot.y;
+    m_rotation.z += rot.z;
+    m_RotationVec = XMLoadFloat3(&m_rotation);
     this->updateView();
 }
 

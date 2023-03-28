@@ -22,6 +22,9 @@ public:
 
 	HRESULT initialize(ID3D11Device* device, DWORD* data, UINT indexCount)
 	{
+        if (m_buffer.Get() != nullptr)
+            m_buffer.Reset();
+
         m_bufferSize = indexCount;
 
         D3D11_BUFFER_DESC l_indexBufferDesc = { 0 };

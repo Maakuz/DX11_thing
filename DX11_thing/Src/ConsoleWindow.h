@@ -5,9 +5,10 @@
 #include <DirectXColors.h>
 #include <map>
 #include "Graphics/ImGui/imgui.h"
+#include "Monitor.h"
 
 #define printfCon(format, ...) ConsoleWindow::get().printf(format, __VA_ARGS__)
-#define monitorCon(lableStr, valueStr) ConsoleWindow::get().monitor(lableStr, valueStr)
+#define monitorCon ConsoleWindow::get().getMonitor()
 
 typedef std::vector<std::string> Arguments;
 
@@ -46,7 +47,8 @@ public:
 	void update();
 	void toggleOpen();
 	void runCommand(std::string command);
-	void monitor(std::string lable, std::string value);
+
+	Monitor& getMonitor() { return m_monitor; }
 
 private:
 	struct Command
@@ -78,13 +80,12 @@ private:
 		}
 	};
 
-	struct 
+	Monitor m_monitor;
 
 	std::vector<Command> m_commands;
 	std::vector<LogEntry> m_log;
 	std::vector<std::string> m_history;
 
-	std::map<std::string, std::string> m_monitoredValues;
 
 	int m_historyPos;
 	bool m_justOpened;

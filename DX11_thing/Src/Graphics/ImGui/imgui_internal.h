@@ -2540,7 +2540,7 @@ struct IMGUI_API ImGuiTable
 {
     ImGuiID                     ID;
     ImGuiTableFlags             Flags;
-    void*                       RawData;                    // Single allocation to hold Columns[], DisplayOrderToIndex[] and RowCellData[]
+    void*                       Data;                    // Single allocation to hold Columns[], DisplayOrderToIndex[] and RowCellData[]
     ImGuiTableTempData*         TempData;                   // Transient data while table is active. Point within g.CurrentTableStack[]
     ImSpan<ImGuiTableColumn>    Columns;                    // Point within RawData[]
     ImSpan<ImGuiTableColumnIdx> DisplayOrderToIndex;        // Point within RawData[]. Store display order of columns (when not reordered, the values are 0...Count-1)
@@ -2645,7 +2645,7 @@ struct IMGUI_API ImGuiTable
     bool                        HostSkipItems;              // Backup of InnerWindow->SkipItem at the end of BeginTable(), because we will overwrite InnerWindow->SkipItem on a per-column basis
 
     ImGuiTable()                { memset(this, 0, sizeof(*this)); LastFrameActive = -1; }
-    ~ImGuiTable()               { IM_FREE(RawData); }
+    ~ImGuiTable()               { IM_FREE(Data); }
 };
 
 // Transient data that are only needed between BeginTable() and EndTable(), those buffers are shared (1 per level of stacked table).

@@ -283,7 +283,7 @@ void ConsoleWindow::update()
 
             if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
                 ImGui::SetScrollHereY(1.f);
-
+            
             ImGui::EndChild();
             ImGui::Separator();
 
@@ -300,8 +300,7 @@ void ConsoleWindow::update()
 
         if (ImGui::BeginTabItem("Monitor"))
         {
-            for (const auto& item : m_monitoredValues)
-                ImGui::Text("%s: %s", item.first.c_str(), item.second.c_str());
+            m_monitor.update();
 
             ImGui::EndTabItem();
         }
@@ -382,9 +381,4 @@ void ConsoleWindow::runCommand(std::string command)
     {
         addLog("Command \"" + l_actualCommand + "\" not found.", ConsoleColors::error);
     }
-}
-
-void ConsoleWindow::monitor(std::string lable, std::string value)
-{
-    m_monitoredValues.insert_or_assign(lable, value);
 }

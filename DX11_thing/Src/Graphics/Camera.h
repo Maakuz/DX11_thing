@@ -19,12 +19,16 @@ public:
     const DirectX::XMVECTOR& getRight() const { return m_right; }
 
     void setPos(const DirectX::XMVECTOR& pos);
+    void setPos(const DirectX::XMFLOAT3& pos);
     void setPos(float x, float y, float z);
     void move(const DirectX::XMVECTOR& pos);    //Adjusts to current position + input value
+    void move(const DirectX::XMFLOAT3& pos);    //Adjusts to current position + input value
     void move(float x, float y, float z);       //Adjusts to current position + input value
     void setRotation(const DirectX::XMVECTOR& rot);
+    void setRotation(const DirectX::XMFLOAT3& rot);
     void setRotation(float x, float y, float z);
     void rotate(const DirectX::XMVECTOR& rot);  //Ajdusts to current rotation + input value
+    void rotate(const DirectX::XMFLOAT3& rot);  //Ajdusts to current rotation + input value
     void rotate(float x, float y, float z);     //Ajdusts to current rotation + input value
     void setLookAt(DirectX::XMFLOAT3 lookAt);
 

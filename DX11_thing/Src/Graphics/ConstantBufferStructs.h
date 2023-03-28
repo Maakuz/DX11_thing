@@ -25,4 +25,9 @@ namespace ConstantBuffers
     {
         DirectX::XMMATRIX mat;
     };
+
+    struct PS_pixelshader
+    {
+        float alpha = 1;
+    };
 }

@@ -23,7 +23,7 @@ bool Graphics::initialize(HWND hwnd, int width, int height)
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(m_device.Get(), m_deviceContext.Get());
     ImGui::StyleColorsDark();
-
+    
     return true;
 }
 
@@ -41,24 +41,20 @@ void Graphics::render()
     m_deviceContext->VSSetShader(m_vertexShader.getShader(), NULL, 0);
 
     m_deviceContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
+    //m_deviceContext->OMSetBlendState(m_blendstateState.Get(), NULL, 0xFFFFFFFF);
+    m_deviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
     m_deviceContext->PSSetShader(m_pixelShader.getShader(), NULL, 0);
 
-    //CB 
-    DirectX::XMMATRIX l_world = DirectX::XMMatrixIdentity();
-    m_constantBuffer.m_data.mat = l_world * m_camera.getView() * m_camera.getProjection();
-    m_constantBuffer.m_data.mat = DirectX::XMMatrixTranspose(m_constantBuffer.m_data.mat);
-    m_constantBuffer.UpdateBuffer();
+    static float xOffset = 0.f;
+    monitorCon.addDragFloat("xOffset", &xOffset, 0.01f);
 
-    m_deviceContext->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
+    static float zRot = 0.f;
+    monitorCon.addDragFloat("zRot", &zRot, 0.01f);
 
-    UINT l_stride = sizeof(Vertex);
-    UINT l_offset = 0;
+    m_model.setPos(xOffset, 0, 0);
+    m_model.setRotation(0, 0, zRot);
 
-    m_deviceContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), m_vertexBuffer.StridePtr(), &l_offset);
-    m_deviceContext->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-    m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
-    m_deviceContext->DrawIndexed(m_indexBuffer.IndexCount(), 0, 0); //TODO: No hardcoded num
+    m_model.draw(m_camera.getView() * m_camera.getProjection());
 
     //text //TODO: MAKE BETTER
     static int s_fps = 0;
@@ -67,10 +63,12 @@ void Graphics::render()
 
     if (m_timer.millisecondsElapsed() > 1000)
     {
-        monitorCon("FPS", std::to_string(s_fps));
+        s_fpsStr = std::to_string(s_fps);
+        monitorCon.addString("FPS", &s_fpsStr);
         s_fps = 0;
         m_timer.restart();
     }
+
 
     //m_spriteBatch->Begin();
     //m_spriteFont->DrawString(m_spriteBatch.get(), s_fpsStr.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT2(1, 1));
@@ -88,165 +86,134 @@ void Graphics::render()
 
 Graphics::~Graphics()
 {
-    ImGui_ImplWin32_Shutdown();
-    ImGui_ImplDX11_Shutdown();
-    ImGui::DestroyContext();
+    if (ImGui::GetCurrentContext())
+    {
+        ImGui_ImplWin32_Shutdown();
+        ImGui_ImplDX11_Shutdown();
+        ImGui::DestroyContext();
+    }
 }
 
 bool Graphics::initializeDirectX(HWND hwnd)
 {
-    std::vector<AdapterData> l_adapters = AdapterReader::getAdapters();
+    try {
+        std::vector<AdapterData> l_adapters = AdapterReader::getAdapters();
 
-    if (l_adapters.size() < 1)
-    {
-        ErrorLogger::log("No DXGI adapters found.");
-        return false;
+        if (l_adapters.size() < 1)
+        {
+            ErrorLogger::log("No DXGI adapters found.");
+            return false;
+        }
+
+        DXGI_SWAP_CHAIN_DESC l_scd = { 0 };
+
+        l_scd.BufferDesc.Width = m_winWidth;
+        l_scd.BufferDesc.Height = m_winHeight;
+        l_scd.BufferDesc.RefreshRate.Numerator = 120;
+        l_scd.BufferDesc.RefreshRate.Denominator = 1;
+        l_scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        l_scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+        l_scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+        l_scd.SampleDesc.Count = 1;
+        l_scd.SampleDesc.Quality = 0;
+
+        l_scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        l_scd.BufferCount = 1;
+        l_scd.OutputWindow = hwnd;
+        l_scd.Windowed = true;
+        l_scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+        l_scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+        HRESULT l_hr = D3D11CreateDeviceAndSwapChain(
+            l_adapters[0].m_pAdapter,
+            D3D_DRIVER_TYPE_UNKNOWN,
+            NULL,   //SOFTWARE DRIVER TYPE
+            NULL,   //RUNTIME LAYERS
+            NULL,   //FEATURE LEVELS ARRAY
+            0,      //FEATURE LEVELS AMOUNT
+            D3D11_SDK_VERSION,
+            &l_scd,
+            m_swapChain.GetAddressOf(),
+            m_device.GetAddressOf(),
+            NULL, //SUPPORTED FEATURE LEVELS
+            m_deviceContext.GetAddressOf());
+
+        COM_ERROR_IF_FAILED(l_hr, "Failed to create device and swap chain.");
+
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> l_backBuffer;
+        l_hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(l_backBuffer.GetAddressOf()));
+        COM_ERROR_IF_FAILED(l_hr, "GetBuffer failed");
+
+        l_hr = m_device->CreateRenderTargetView(l_backBuffer.Get(), NULL, m_renderTargetView.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "CreateRenderTargetView failed");
+
+        //Depth stencil
+        CD3D11_TEXTURE2D_DESC l_depthStencilDesc(
+            DXGI_FORMAT_D24_UNORM_S8_UINT, 
+            m_winWidth, 
+            m_winHeight, 
+            1, 
+            1, 
+            D3D11_BIND_DEPTH_STENCIL);
+
+        l_hr = m_device->CreateTexture2D(&l_depthStencilDesc, NULL, m_depthStencilBuffer.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Failed creating depth texture");
+
+        l_hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), NULL, m_depthStencilView.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Failed creating depth stencil view.");
+
+        m_deviceContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
+
+        //Depth stencil state
+        CD3D11_DEPTH_STENCIL_DESC l_depthStencilStateDesc(D3D11_DEFAULT);
+        l_depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+        l_hr = m_device->CreateDepthStencilState(&l_depthStencilStateDesc, m_depthStencilState.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Failed creating depth stencil state.");
+
+        //Viewport
+        CD3D11_VIEWPORT l_viewPort(0.f, 0.f, float(m_winWidth), float(m_winHeight));
+        m_deviceContext->RSSetViewports(1, &l_viewPort);
+
+        CD3D11_RASTERIZER_DESC l_rasterDesc(D3D11_DEFAULT); //Wireframe can be set here
+
+        l_hr = m_device->CreateRasterizerState(&l_rasterDesc, m_rasterizerState.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Failed creating raster state.");
+
+        //Blendstate
+        D3D11_BLEND_DESC l_blendDesc = { 0 };
+        D3D11_RENDER_TARGET_BLEND_DESC l_renderTargetBlendDesc = { 0 };
+
+        l_renderTargetBlendDesc.BlendEnable = true;
+        l_renderTargetBlendDesc.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+        l_renderTargetBlendDesc.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+        l_renderTargetBlendDesc.BlendOp = D3D11_BLEND_OP_ADD;
+        l_renderTargetBlendDesc.SrcBlendAlpha = D3D11_BLEND_ONE;
+        l_renderTargetBlendDesc.DestBlendAlpha = D3D11_BLEND_ZERO;
+        l_renderTargetBlendDesc.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        l_renderTargetBlendDesc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+        l_blendDesc.RenderTarget[0] = l_renderTargetBlendDesc;
+
+        l_hr = m_device->CreateBlendState(&l_blendDesc, m_blendstateState.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Failed creating blend state");
+
+        m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(m_deviceContext.Get());
+        m_spriteFont = std::make_unique<DirectX::SpriteFont>(m_device.Get(), L"Data/Fonts/Comic_sans16.spritefont");
+
+        //Sampler
+        CD3D11_SAMPLER_DESC l_sampDesc(D3D11_DEFAULT);
+        l_sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        l_sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        l_sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+        l_hr = m_device->CreateSamplerState(&l_sampDesc, m_samplerState.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Failed creating sampler state.");
     }
-
-    DXGI_SWAP_CHAIN_DESC l_scd = { 0 };
-
-    l_scd.BufferDesc.Width = m_winWidth;
-    l_scd.BufferDesc.Height = m_winHeight;
-    l_scd.BufferDesc.RefreshRate.Numerator = 120;
-    l_scd.BufferDesc.RefreshRate.Denominator = 1;
-    l_scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    l_scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    l_scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-
-    l_scd.SampleDesc.Count = 1;
-    l_scd.SampleDesc.Quality = 0;
-
-    l_scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    l_scd.BufferCount = 1;
-    l_scd.OutputWindow = hwnd;
-    l_scd.Windowed = true;
-    l_scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    l_scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-
-    HRESULT l_hr = D3D11CreateDeviceAndSwapChain(
-        l_adapters[0].m_pAdapter,
-        D3D_DRIVER_TYPE_UNKNOWN,
-        NULL,   //SOFTWARE DRIVER TYPE
-        NULL,   //RUNTIME LAYERS
-        NULL,   //FEATURE LEVELS ARRAY
-        0,      //FEATURE LEVELS AMOUNT
-        D3D11_SDK_VERSION,
-        &l_scd,
-        m_swapChain.GetAddressOf(),
-        m_device.GetAddressOf(),
-        NULL, //SUPPORTED FEATURE LEVELS
-        m_deviceContext.GetAddressOf());
-
-    if (FAILED(l_hr))
+    catch (COMException& e)
     {
-        ErrorLogger::log(l_hr, "Failed to create device and swap chain.");
-        return false;
-    }
-
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> l_backBuffer;
-    l_hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(l_backBuffer.GetAddressOf()));
-    
-    if (FAILED(l_hr)) 
-    {
-        ErrorLogger::log(l_hr, "GetBuffer failed");
-        return false;
-    }
-
-    l_hr = m_device->CreateRenderTargetView(l_backBuffer.Get(), NULL, m_renderTargetView.GetAddressOf());
-
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "CreateRenderTargetView failed");
-        return false;
-    }
-
-    //Depth stencil
-    D3D11_TEXTURE2D_DESC l_depthStencilDesc;
-    l_depthStencilDesc.Width = m_winWidth;
-    l_depthStencilDesc.Height = m_winHeight;
-    l_depthStencilDesc.MipLevels = 1;
-    l_depthStencilDesc.ArraySize = 1;
-    l_depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    l_depthStencilDesc.SampleDesc.Count = 1;
-    l_depthStencilDesc.SampleDesc.Quality = 0;
-    l_depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-    l_depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    l_depthStencilDesc.CPUAccessFlags = 0;
-    l_depthStencilDesc.MiscFlags = 0;
-
-    l_hr = m_device->CreateTexture2D(&l_depthStencilDesc, NULL, m_depthStencilBuffer.GetAddressOf());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Failed creating depth texture.");
-        return false;
-    }
-
-    l_hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), NULL, m_depthStencilView.GetAddressOf());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Failed creating depth stencil view.");
-        return false;
-    }
-
-    m_deviceContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
-
-    //Depth stencil state
-    D3D11_DEPTH_STENCIL_DESC l_depthStencilStateDesc = { 0 };
-    l_depthStencilStateDesc.DepthEnable = true;
-    l_depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    l_depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-
-    l_hr = m_device->CreateDepthStencilState(&l_depthStencilStateDesc, m_depthStencilState.GetAddressOf());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Failed creating depth stencil state.");
-        return false;
-    }
-
-    //Viewport
-    D3D11_VIEWPORT l_viewPort = {0};
-
-    l_viewPort.TopLeftX = 0;
-    l_viewPort.TopLeftY = 0;
-    l_viewPort.Width = m_winWidth;
-    l_viewPort.Height = m_winHeight;
-    l_viewPort.MaxDepth = 0.f;
-    l_viewPort.MaxDepth = 1.f;
-
-    m_deviceContext->RSSetViewports(1, &l_viewPort);
-
-    D3D11_RASTERIZER_DESC l_rasterDesc;
-    ZeroMemory(&l_rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
-
-    l_rasterDesc.FillMode = D3D11_FILL_SOLID; //Wireframe possible
-    l_rasterDesc.CullMode = D3D11_CULL_BACK;
-    l_hr = m_device->CreateRasterizerState(&l_rasterDesc, m_rasterizerState.GetAddressOf());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Failed creating raster state.");
-        return false;
-    }
-
-    m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(m_deviceContext.Get());
-    m_spriteFont = std::make_unique<DirectX::SpriteFont>(m_device.Get(), L"Data/Fonts/Comic_sans16.spritefont");
-
-    //Sampler
-    D3D11_SAMPLER_DESC l_sampDesc;
-    ZeroMemory(&l_sampDesc, sizeof(D3D11_SAMPLER_DESC));
-
-    l_sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    l_sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    l_sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    l_sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-    l_sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    l_sampDesc.MinLOD = 0;
-    l_sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-    l_hr = m_device->CreateSamplerState(&l_sampDesc, m_samplerState.GetAddressOf());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Failed creating sampler state.");
+        ErrorLogger::log(e);
         return false;
     }
 
@@ -292,58 +259,34 @@ bool Graphics::initializeShaders()
 
 bool Graphics::initializeScene()
 {
-    Vertex l_v[] =
+    try
     {
-        {-0.3f, 0.3f, 0.f, 
-        0.f, 0.f},
+        HRESULT l_hr = DirectX::CreateWICTextureFromFile(m_device.Get(), L"Data/Textures/grass.jpeg", nullptr, m_textureGrass.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Texture load failed.");
 
-        {0.3, 0.3, 0.f,
-        1.f, 0.f},
+        l_hr = DirectX::CreateWICTextureFromFile(m_device.Get(), L"Data/Textures/stone.jpeg", nullptr, m_texturePavement.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Texture load failed.");
 
-        {0.3, -0.3, 0.f,
-        1.f, 1.f},
+        l_hr = DirectX::CreateWICTextureFromFile(m_device.Get(), L"Data/Textures/julpeg.png", nullptr, m_textureMissing.GetAddressOf());
+        COM_ERROR_IF_FAILED(l_hr, "Texture load failed.");
 
-        {-0.3, -0.3, 0.f,
-        0.f, 1.f},
-    };
+        l_hr = m_constantVertexBuffer.initialize(m_device.Get(), m_deviceContext.Get());
+        COM_ERROR_IF_FAILED(l_hr, "Failed to create CB.");
 
-    DWORD l_indicies[] = 
+        l_hr = m_constantPixelBuffer.initialize(m_device.Get(), m_deviceContext.Get());
+        COM_ERROR_IF_FAILED(l_hr, "VFailed to create CB.");
+
+        m_model.initialize("Data/Models/cubeTri.obj", m_device.Get(), m_deviceContext.Get(), m_textureMissing.Get(), m_constantVertexBuffer);
+
+        m_camera.setPos(0, 0, -2);
+        m_camera.setProjecton(90, float(m_winWidth) / float(m_winHeight), 0.1f, 1000.f);
+    }
+    
+    catch (COMException& e)
     {
-        0, 1, 2, 
-        2, 3, 0
-    };
-
-    HRESULT l_hr = m_vertexBuffer.initialize(m_device.Get(), l_v, ARRAYSIZE(l_v));
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Vertex buffer creation failed.");
+        ErrorLogger::log(e);
         return false;
     }
-
-    l_hr = m_indexBuffer.initialize(m_device.Get(), l_indicies, 6);
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "index buffer creation failed.");
-        return false;
-    }
-
-    //Texture setup
-    l_hr = DirectX::CreateWICTextureFromFile(m_device.Get(), L"Data/Textures/julpeg.png", nullptr, m_texture.GetAddressOf());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Texture load failed.");
-        return false;
-    }
-
-    l_hr =  m_constantBuffer.initialize(m_device.Get(), m_deviceContext.Get());
-    if (FAILED(l_hr))
-    {
-        ErrorLogger::log(l_hr, "Failed to create CB.");
-        return false;
-    }
-
-    m_camera.setPos(0, 0, -2);
-    m_camera.setProjecton(90, float(m_winWidth) / float(m_winHeight), 0.1f, 1000.f);
 
     return true;
 }

@@ -160,10 +160,14 @@
     <ClCompile Include="Src\Graphics\ImGui\imgui_stdlib.cpp" />
     <ClCompile Include="Src\Graphics\ImGui\imgui_tables.cpp" />
     <ClCompile Include="Src\Graphics\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Src\Graphics\Mesh.cpp" />
+    <ClCompile Include="Src\Graphics\Model.cpp" />
+    <ClCompile Include="Src\Graphics\ModelImporter.cpp" />
     <ClCompile Include="Src\Graphics\Shaders.cpp" />
     <ClCompile Include="Src\Keyboard\Keyboard.cpp" />
     <ClCompile Include="Src\Engine.cpp" />
     <ClCompile Include="Src\Main.cpp" />
+    <ClCompile Include="Src\Monitor.cpp" />
     <ClCompile Include="Src\Mouse\Mouse.cpp" />
     <ClCompile Include="Src\RenderWindow.cpp" />
     <ClCompile Include="Src\Timer.cpp" />
@@ -171,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imgui-master\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="Src\COMException.h" />
     <ClInclude Include="Src\ConsoleWindow.h" />
     <ClInclude Include="Src\Graphics\ImGui\imconfig.h" />
     <ClInclude Include="Src\Graphics\ImGui\imgui.h" />
@@ -181,6 +186,11 @@
     <ClInclude Include="Src\Graphics\ImGui\imstb_rectpack.h" />
     <ClInclude Include="Src\Graphics\ImGui\imstb_textedit.h" />
     <ClInclude Include="Src\Graphics\ImGui\imstb_truetype.h" />
+    <ClInclude Include="Src\Graphics\Mesh.h" />
+    <ClInclude Include="Src\Graphics\Model.h" />
+    <ClInclude Include="Src\Graphics\ModelImporter.h" />
+    <ClInclude Include="Src\Monitor.h" />
+    <ClInclude Include="Src\StringSplitter.h" />
     <ClInclude Include="Src\Timer.h" />
     <ClInclude Include="Src\Definitions.h" />
     <ClInclude Include="Src\Graphics\AdapterReader.h" />

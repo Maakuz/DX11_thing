@@ -83,8 +83,6 @@ bool Engine::update()
         m_gfx.m_camera.move(0, -CAMERA_SPEED * l_deltaTime, 0);
     }
 
-
-
     if (m_keyboard.isKeyPressed(27)) //ESC - Close application
     {
         return false;

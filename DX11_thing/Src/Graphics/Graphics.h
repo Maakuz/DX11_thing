@@ -1,13 +1,10 @@
 #pragma once
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "Vertex.h"
+#include "Model.h"
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <WICTextureLoader.h>
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "ConstantBuffer.h"
 #include "Camera.h"
 #include "../Timer.h"
 #include "ImGui/imgui.h"
@@ -35,13 +32,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> m_blendstateState;
 
 	VertexShader m_vertexShader;
 	PixelShader m_pixelShader;
 
-	VertexBuffer<Vertex> m_vertexBuffer;
-	IndexBuffer m_indexBuffer;
-	ConstantBuffer<ConstantBuffers::VS_vertexshader> m_constantBuffer;
+	Model m_model;
+	ConstantBuffer<ConstantBuffers::VS_vertexshader> m_constantVertexBuffer;
+	ConstantBuffer<ConstantBuffers::PS_pixelshader> m_constantPixelBuffer;
 
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
@@ -52,7 +50,9 @@ private:
 	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_textureGrass;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texturePavement;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_textureMissing;
 
 	Timer m_timer;
 

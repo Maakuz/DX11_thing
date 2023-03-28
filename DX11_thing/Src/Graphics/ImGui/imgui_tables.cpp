@@ -505,10 +505,10 @@ bool    ImGui::BeginTableEx(const char* name, ImGuiID id, int columns_count, ImG
     {
         // Attempt to preserve width on column count change (#4046)
         old_columns_to_preserve = table->Columns.Data;
-        old_columns_raw_data = table->RawData;
-        table->RawData = NULL;
+        old_columns_raw_data = table->Data;
+        table->Data = NULL;
     }
-    if (table->RawData == NULL)
+    if (table->Data == NULL)
     {
         TableBeginInitMemory(table, columns_count);
         table->IsInitializing = table->IsSettingsRequestLoad = true;
@@ -601,9 +601,9 @@ void ImGui::TableBeginInitMemory(ImGuiTable* table, int columns_count)
     span_allocator.Reserve(2, columns_count * sizeof(ImGuiTableCellData), 4);
     for (int n = 3; n < 6; n++)
         span_allocator.Reserve(n, columns_bit_array_size);
-    table->RawData = IM_ALLOC(span_allocator.GetArenaSizeInBytes());
-    memset(table->RawData, 0, span_allocator.GetArenaSizeInBytes());
-    span_allocator.SetArenaBasePtr(table->RawData);
+    table->Data = IM_ALLOC(span_allocator.GetArenaSizeInBytes());
+    memset(table->Data, 0, span_allocator.GetArenaSizeInBytes());
+    span_allocator.SetArenaBasePtr(table->Data);
     span_allocator.GetSpan(0, &table->Columns);
     span_allocator.GetSpan(1, &table->DisplayOrderToIndex);
     span_allocator.GetSpan(2, &table->RowCellData);
