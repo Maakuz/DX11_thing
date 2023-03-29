@@ -9,9 +9,12 @@ bool Model::initialize(std::string filePath, ID3D11Device* device, ID3D11DeviceC
 
     ModelImporter::Data l_data = ModelImporter::loadObjModel(filePath);
 
+    std::vector<Texture> textures;
+    textures.push_back(Texture(device, Colors::UnloadedTextureColor, TextureType::Diffuse));
+
     try 
     {
-        m_meshes.push_back(Mesh(m_device, m_deviceContext, l_data.vertices, l_data.indices));
+        m_meshes.push_back(Mesh(m_device, m_deviceContext, l_data.vertices, l_data.indices, textures));
     }
     catch (COMException& e)
     {

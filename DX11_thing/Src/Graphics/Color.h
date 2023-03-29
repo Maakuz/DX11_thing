@@ -1,12 +1,6 @@
 #pragma once
 typedef unsigned char BYTE;
 
-namespace Colors
-{
-    const Color UnloadedTextureColor(100, 0, 100);
-    const Color UnHandledTextureColor(255, 0, 0);
-}
-
 class Color
 {
 public:
@@ -45,3 +39,9 @@ private:
         unsigned int color;
     };
 };
+
+namespace Colors
+{
+    const Color UnloadedTextureColor(100, 0, 100);
+    const Color UnHandledTextureColor(255, 0, 0);
+}

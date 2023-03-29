@@ -5,7 +5,7 @@
 
 //TODO: Create material
 
-enum TextureStorageType
+enum class TextureStorageType
 {
     Invalid, 
     None,
@@ -17,9 +17,10 @@ enum TextureStorageType
 };
 
 //TODO: move to importer probably
-enum TextureType
+enum class TextureType
 {
-    Unknown
+    Unknown,
+    Diffuse
 };
 
 class Texture

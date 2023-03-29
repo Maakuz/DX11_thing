@@ -18,11 +18,19 @@ Mesh::Mesh(const Mesh& mesh)
     m_deviceContext = mesh.m_deviceContext;
     m_indexBuffer = mesh.m_indexBuffer;
     m_vertexBuffer = mesh.m_vertexBuffer;
+    m_textures = mesh.m_textures;
 }
 
 void Mesh::draw()
 {
     UINT l_offset = 0;
+
+    for (Texture& texture : m_textures)
+    {
+        if (texture.getType() == TextureType::Diffuse)
+            m_deviceContext->PSSetShaderResources(0, 1, texture.getTextureResourceViewAddress());
+    }
+
     m_deviceContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), m_vertexBuffer.StridePtr(), &l_offset);
     m_deviceContext->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
     m_deviceContext->DrawIndexed(m_indexBuffer.IndexCount(), 0, 0);
