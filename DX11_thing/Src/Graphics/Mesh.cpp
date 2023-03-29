@@ -1,8 +1,9 @@
 #include "Mesh.h"
 
-Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, std::vector<Vertex>& vertices, std::vector<DWORD>& indices)
+Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, std::vector<Vertex>& vertices, std::vector<DWORD>& indices, std::vector<Texture> textures)
 {
     m_deviceContext = context;
+    m_textures = textures;
 
     HRESULT l_hr = m_vertexBuffer.initialize(device, vertices.data(), vertices.size());
     COM_ERROR_IF_FAILED(l_hr, "Vertex buffer creation failed.");

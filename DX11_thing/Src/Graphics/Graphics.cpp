@@ -51,10 +51,10 @@ void Graphics::render()
     static float zRot = 0.f;
     monitorCon.addDragFloat("zRot", &zRot, 0.01f);
 
-    m_model.setPos(xOffset, 0, 0);
-    m_model.setRotation(0, 0, zRot);
+    m_object.setPos(xOffset, 0, 0);
+    m_object.setRotation(0, 0, zRot);
 
-    m_model.draw(m_camera.getView() * m_camera.getProjection());
+    m_object.draw(m_camera.getView() * m_camera.getProjection());
 
     //text //TODO: MAKE BETTER
     static int s_fps = 0;
@@ -276,7 +276,7 @@ bool Graphics::initializeScene()
         l_hr = m_constantPixelBuffer.initialize(m_device.Get(), m_deviceContext.Get());
         COM_ERROR_IF_FAILED(l_hr, "VFailed to create CB.");
 
-        m_model.initialize("Data/Models/cubeTri.obj", m_device.Get(), m_deviceContext.Get(), m_textureMissing.Get(), m_constantVertexBuffer);
+        m_object.initialize("Data/Models/cube.obj", m_device.Get(), m_deviceContext.Get(), m_constantVertexBuffer);
 
         m_camera.setPos(0, 0, -2);
         m_camera.setProjecton(90, float(m_winWidth) / float(m_winHeight), 0.1f, 1000.f);

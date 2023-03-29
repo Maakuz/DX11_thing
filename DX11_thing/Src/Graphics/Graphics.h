@@ -1,7 +1,7 @@
 #pragma once
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "Model.h"
+#include "../GameObject.h"
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <WICTextureLoader.h>
@@ -37,7 +37,7 @@ private:
 	VertexShader m_vertexShader;
 	PixelShader m_pixelShader;
 
-	Model m_model;
+	GameObject m_object;
 	ConstantBuffer<ConstantBuffers::VS_vertexshader> m_constantVertexBuffer;
 	ConstantBuffer<ConstantBuffers::PS_pixelshader> m_constantPixelBuffer;
 

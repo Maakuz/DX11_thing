@@ -8,8 +8,8 @@ class VertexBuffer
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
-	std::shared_ptr<UINT> m_stride;
-	UINT m_bufferSize = 0;
+	UINT m_stride = sizeof(T);
+	UINT m_vertexCount = 0;
 
 public:
 	VertexBuffer() {}
@@ -17,7 +17,7 @@ public:
 	VertexBuffer<T>& operator=(const VertexBuffer<T>& cop)
 	{
 		m_buffer = cop.m_buffer;
-		m_bufferSize = cop.m_bufferSize;
+		m_vertexCount = cop.m_vertexCount;
 		m_stride = cop.m_stride;
 		return *this;
 	}
@@ -25,7 +25,7 @@ public:
 	VertexBuffer(const VertexBuffer<T>& cop)
 	{
 		m_buffer = cop.m_buffer;
-		m_bufferSize = cop.m_bufferSize;
+		m_vertexCount = cop.m_vertexCount;
 		m_stride = cop.m_stride;
 	}
 
@@ -33,26 +33,23 @@ public:
 
 	ID3D11Buffer* const* GetAddressOf() const { return m_buffer.GetAddressOf(); }
 
-	UINT BufferSize() const { return m_bufferSize; }
+	UINT VertexCount() const { return m_vertexCount; }
 
-	const UINT Stride() const { return *m_stride.Get(); }
+	const UINT Stride() const { return m_stride; }
 
-	const UINT* StridePtr() const { return m_stride.get(); }
+	const UINT* StridePtr() const { return &m_stride; }
 
 	HRESULT initialize(ID3D11Device* device, T* data, UINT vertexCount)
 	{
 		if (m_buffer.Get() != nullptr)
 			m_buffer.Reset();
 
-		if (m_stride.get() == nullptr)
-			m_stride = std::make_shared<UINT>(sizeof(T));
-
-		m_bufferSize = vertexCount;
+		m_vertexCount = vertexCount;
 
 		D3D11_BUFFER_DESC l_vertexBufferDesc = { 0 };
 
 		l_vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		l_vertexBufferDesc.ByteWidth = sizeof(T) * vertexCount;
+		l_vertexBufferDesc.ByteWidth = m_stride * vertexCount;
 		l_vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		l_vertexBufferDesc.CPUAccessFlags = 0;
 		l_vertexBufferDesc.MiscFlags = 0;

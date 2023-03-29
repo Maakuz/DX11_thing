@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\imgui-master\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="Src\ConsoleWindow.cpp" />
+    <ClCompile Include="Src\GameObject.cpp" />
     <ClCompile Include="Src\Graphics\AdapterReader.cpp" />
     <ClCompile Include="Src\Graphics\Camera.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="Src\Graphics\Model.cpp" />
     <ClCompile Include="Src\Graphics\ModelImporter.cpp" />
     <ClCompile Include="Src\Graphics\Shaders.cpp" />
+    <ClCompile Include="Src\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Keyboard\Keyboard.cpp" />
     <ClCompile Include="Src\Engine.cpp" />
     <ClCompile Include="Src\Main.cpp" />
@@ -177,6 +179,8 @@
     <ClInclude Include="..\..\imgui-master\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="Src\COMException.h" />
     <ClInclude Include="Src\ConsoleWindow.h" />
+    <ClInclude Include="Src\GameObject.h" />
+    <ClInclude Include="Src\Graphics\Color.h" />
     <ClInclude Include="Src\Graphics\ImGui\imconfig.h" />
     <ClInclude Include="Src\Graphics\ImGui\imgui.h" />
     <ClInclude Include="Src\Graphics\ImGui\imgui_impl_dx11.h" />
@@ -189,6 +193,7 @@
     <ClInclude Include="Src\Graphics\Mesh.h" />
     <ClInclude Include="Src\Graphics\Model.h" />
     <ClInclude Include="Src\Graphics\ModelImporter.h" />
+    <ClInclude Include="Src\Graphics\Texture.h" />
     <ClInclude Include="Src\Monitor.h" />
     <ClInclude Include="Src\StringSplitter.h" />
     <ClInclude Include="Src\Timer.h" />
