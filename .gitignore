@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/FBXLoader/Include/FBX
+/FBXLoader/Lib/FBX
+/FBXLoader/libfbxsdk.dll

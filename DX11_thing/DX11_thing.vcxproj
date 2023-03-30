@@ -123,6 +123,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>F:\SPELTJOSAN\DX11_thing\DX11_thing\Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,7 +149,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\imgui-master\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="Src\ConsoleWindow.cpp" />
     <ClCompile Include="Src\GameObject.cpp" />
     <ClCompile Include="Src\Graphics\AdapterReader.cpp" />
@@ -176,7 +176,6 @@
     <ClCompile Include="Src\WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\imgui-master\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="Src\COMException.h" />
     <ClInclude Include="Src\ConsoleWindow.h" />
     <ClInclude Include="Src\GameObject.h" />

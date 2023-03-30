@@ -14,6 +14,7 @@ public:
 	};
 
 	static Data loadObjModel(std::string path);
+
 private:
 	struct Pos
 	{
