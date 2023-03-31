@@ -28,6 +28,9 @@ class Texture
 public:
     Texture(ID3D11Device* device, const Color& col, TextureType type);
     Texture(ID3D11Device* device, const Color& col, UINT width, UINT height, TextureType type);
+    Texture(const Texture& cop);
+    Texture& operator=(const Texture& cop);
+
     TextureType getType() { return m_type; }
     ID3D11ShaderResourceView* getTextureResourceView() { return m_textureView.Get(); }
     ID3D11ShaderResourceView** getTextureResourceViewAddress() { return m_textureView.GetAddressOf(); }

@@ -6,13 +6,24 @@
 class IndexBuffer
 {
 private:
-	IndexBuffer(const IndexBuffer& rhs);
-
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
 	UINT m_indexCount = 0;
 
 public:
 	IndexBuffer() {}
+
+    IndexBuffer(const IndexBuffer& cop)
+    {
+        m_buffer = cop.m_buffer;
+        m_indexCount = cop.m_indexCount;
+    }
+
+    IndexBuffer& operator=(const IndexBuffer& cop)
+    {
+        m_buffer = cop.m_buffer;
+        m_indexCount = cop.m_indexCount;
+        return *this;
+    }
 
 	ID3D11Buffer* Get() const { return m_buffer.Get(); }
 

@@ -6,7 +6,8 @@ cbuffer buf : register(b0)
 struct VS_INPUT
 {
     float3 pos : POS;
-    float3 tex : TEXCOORD;
+    float3 normal : NORMAL;
+    float2 tex : TEXCOORD;
 };
 
 struct VS_OUT

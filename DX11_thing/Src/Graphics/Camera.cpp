@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "../FloatCompare.h"
 using namespace DirectX;
 
 Camera::Camera()
@@ -111,21 +112,23 @@ void Camera::setLookAt(DirectX::XMFLOAT3 lookAt)
     lookAt.y = m_pos.y - lookAt.y;
     lookAt.z = m_pos.z - lookAt.z;
 
-    if (lookAt.x < FLT_EPSILON && lookAt.y < FLT_EPSILON && lookAt.z < FLT_EPSILON)
+    if (FloatCompare::IsEqual(lookAt.x, 0, FLT_EPSILON) && 
+        FloatCompare::IsEqual(lookAt.y, 0, FLT_EPSILON) && 
+        FloatCompare::IsEqual(lookAt.z, 0, FLT_EPSILON))
         return;
 
     float l_pitch = 0.f;
-    if (lookAt.y > FLT_EPSILON)
+    if (!FloatCompare::IsEqual(lookAt.y, 0, FLT_EPSILON))
     {
         float l_distance = sqrt((lookAt.x * lookAt.x) + (lookAt.z * lookAt.z));
         l_pitch = atan(lookAt.y / l_distance);
     }
 
     float l_yaw = 0.f;
-    if (lookAt.x > FLT_EPSILON)
+    if (!FloatCompare::IsEqual(lookAt.x, 0, FLT_EPSILON))
         l_yaw = atan(lookAt.x / lookAt.z);
 
-    if (lookAt.z > FLT_EPSILON)
+    if (!FloatCompare::IsEqual(lookAt.z, 0, FLT_EPSILON))
         l_yaw += XM_PI;
 
     this->setRotation(l_pitch, l_yaw, 0);

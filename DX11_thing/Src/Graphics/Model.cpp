@@ -7,15 +7,11 @@ bool Model::initialize(std::string filePath, ID3D11Device* device, ID3D11DeviceC
     m_deviceContext = context;
     m_constantBuffer = &VS_CB;
 
-    ModelImporter::Data l_data = ModelImporter::loadObjModel(filePath);
-
-    std::vector<Texture> textures;
-    textures.push_back(Texture(device, Colors::UnloadedTextureColor, TextureType::Diffuse));
-
     try 
     {
-        m_meshes.push_back(Mesh(m_device, m_deviceContext, l_data.vertices, l_data.indices, textures));
+        m_meshes = ModelImporter::loadModel(filePath, device, context);
     }
+
     catch (COMException& e)
     {
         ErrorLogger::log(e);

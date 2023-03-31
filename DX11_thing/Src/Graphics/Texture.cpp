@@ -11,6 +11,21 @@ Texture::Texture(ID3D11Device* device, const Color& col, UINT width, UINT height
     this->initializeColorTexture(device, col, width, height, type);
 }
 
+Texture::Texture(const Texture& cop)
+{
+    m_texture = cop.m_texture;
+    m_textureView = cop.m_textureView;
+    m_type = cop.m_type;
+}
+
+Texture& Texture::operator=(const Texture& cop)
+{
+    m_texture = cop.m_texture;
+    m_textureView = cop.m_textureView;
+    m_type = cop.m_type;
+    return *this;
+}
+
 void Texture::initialize1x1ColorTexture(ID3D11Device* device, const Color& col, TextureType type)
 {
     this->initializeColorTexture(device, col, 1, 1, type);

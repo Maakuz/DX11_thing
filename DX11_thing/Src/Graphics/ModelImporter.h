@@ -3,30 +3,27 @@
 #include <vector>
 #include <d3d11.h>
 #include "../ErrorLogger.h"
+#include "Mesh.h"
+#include "Material.h"
+
+//Test multimaterial import (currently exporter is not supporting it)
+//Test texture import
 
 class ModelImporter
 {
 public:
-	struct Data
-	{
-		std::vector<Vertex> vertices;
-		std::vector<DWORD> indices;
-	};
+    struct MeshData
+    {
+        std::vector<Vertex> vertices;
+        std::vector<DWORD> indices;
+        std::vector<int> materialIndices;
+        std::vector<int> materialUsed;
+        std::vector<Material> materials;
+    };
 
-	static Data loadObjModel(std::string path);
+	static std::vector<Mesh> loadObjModel(std::string path, ID3D11Device* device, ID3D11DeviceContext* context);
+	static std::vector<Mesh> loadModel(std::string path, ID3D11Device* device, ID3D11DeviceContext* context);
 
 private:
-	struct Pos
-	{
-		float x = 0;
-		float y = 0;
-		float z = 0;
-	};
-
-	struct UV
-	{
-		float u = 0;
-		float v = 0;
-	};
 };
 

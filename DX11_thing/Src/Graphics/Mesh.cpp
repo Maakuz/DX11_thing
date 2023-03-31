@@ -21,6 +21,15 @@ Mesh::Mesh(const Mesh& mesh)
     m_textures = mesh.m_textures;
 }
 
+Mesh& Mesh::operator=(const Mesh& mesh)
+{
+    m_deviceContext = mesh.m_deviceContext;
+    m_indexBuffer = mesh.m_indexBuffer;
+    m_vertexBuffer = mesh.m_vertexBuffer;
+    m_textures = mesh.m_textures;
+    return *this;
+}
+
 void Mesh::draw()
 {
     UINT l_offset = 0;

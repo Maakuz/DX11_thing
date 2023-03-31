@@ -178,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="Src\COMException.h" />
     <ClInclude Include="Src\ConsoleWindow.h" />
+    <ClInclude Include="Src\FloatCompare.h" />
     <ClInclude Include="Src\GameObject.h" />
     <ClInclude Include="Src\Graphics\Color.h" />
     <ClInclude Include="Src\Graphics\ImGui\imconfig.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Src\Graphics\ImGui\imstb_rectpack.h" />
     <ClInclude Include="Src\Graphics\ImGui\imstb_textedit.h" />
     <ClInclude Include="Src\Graphics\ImGui\imstb_truetype.h" />
+    <ClInclude Include="Src\Graphics\Material.h" />
     <ClInclude Include="Src\Graphics\Mesh.h" />
     <ClInclude Include="Src\Graphics\Model.h" />
     <ClInclude Include="Src\Graphics\ModelImporter.h" />

@@ -242,8 +242,9 @@ bool Graphics::initializeShaders()
 
     D3D11_INPUT_ELEMENT_DESC l_layout[] =
     {
-        {"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        {"POS",      0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
 
     UINT l_elementCount = ARRAYSIZE(l_layout);
@@ -276,7 +277,7 @@ bool Graphics::initializeScene()
         l_hr = m_constantPixelBuffer.initialize(m_device.Get(), m_deviceContext.Get());
         COM_ERROR_IF_FAILED(l_hr, "VFailed to create CB.");
 
-        m_object.initialize("Data/Models/cube.obj", m_device.Get(), m_deviceContext.Get(), m_constantVertexBuffer);
+        m_object.initialize("Data/Models/cube.bah", m_device.Get(), m_deviceContext.Get(), m_constantVertexBuffer);
 
         m_camera.setPos(0, 0, -2);
         m_camera.setProjecton(90, float(m_winWidth) / float(m_winHeight), 0.1f, 1000.f);
